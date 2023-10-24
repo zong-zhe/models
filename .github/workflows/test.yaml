@@ -16,4 +16,5 @@ jobs:
       run: |
         echo "::set-output name=added::$(git diff --diff-filter=A --name-only origin/main)"
     - name: Show added files
-      run: echo "Added files: ${{ steps.files.outputs.added }}"
+      run: |
+        echo "Added files: ${{ steps.files.outputs.added }}"
