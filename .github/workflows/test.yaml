@@ -1,9 +1,9 @@
 name: Get PR Directory
 
 on:
-  push:
-    branches:
-      - main
+  pull_request:
+    types:
+      - closed
 
 jobs:
   build:
@@ -14,4 +14,4 @@ jobs:
     - name: Get changed files
       id: files
       run: |
-        $(git diff --diff-filter=A --name-only origin/main)
+        git diff --diff-filter=A --name-only origin/main
