@@ -1,5 +1,8 @@
 name: Get changed files
-on: [pull_request]
+on:
+  pull_request:
+    types:
+      - closed
 
 jobs:
   build:
