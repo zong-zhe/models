@@ -18,12 +18,21 @@ jobs:
     runs-on: ubuntu-latest  # windows-latest || macos-latest
     name: Test changed-files
     steps:
-    - name: Get changed files
-      id: changed-files
-      uses: tj-actions/changed-files@v39
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # OR "2" -> To retrieve the preceding commit.
 
-    - name: List all added files
-      run: |
-        for file in ${{ steps.changed-files.outputs.added_files }}; do
-          echo "$file was added"
-        done
+      # Example 1
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v39
+        
+        # To compare changes between the current commit and the last pushed remote commit set `since_last_remote_commit: true`. e.g
+        # with:
+        #   since_last_remote_commit: true 
+
+      - name: List all changed files
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "$file was changed"
+          done
