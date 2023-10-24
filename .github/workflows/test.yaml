@@ -6,22 +6,20 @@ on:
       - closed
 
 jobs:
-  get_directory:
-    runs-on: ubuntu-latest
-
+  build:
+    runs-on: ubuntu-latest  # windows-latest | macos-latest
+    name: Test changed-files
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # OR "2" -> To retrieve the preceding commit.
 
-      - name: Get PR Directory
-        id: pr_directory
-        run: |
-          # 获取 PR 的文件目录路径
-          PR_DIRECTORY=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | xargs -I {} dirname {})
-          echo "::set-output name=directory::${PR_DIRECTORY}"
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v14.6
 
-      - name: List files in directory
+      - name: List all changed files
         run: |
-          # 使用获取到的目录路径进行操作
-          cd ${{ steps.pr_directory.outputs.directory }}
-          ls -l
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "$file was changed"
+          done
