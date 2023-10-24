@@ -1,0 +1,39 @@
+name: Build and Push Image
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get directory names
+        id: get-dir
+        run: |
+          DIR_NAMES=$(git diff --dirstat=files,0 ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | awk '{print $2}')
+          echo "DIR_NAMES=$DIR_NAMES" >> $GITHUB_ENV
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1 
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker images
+        run: |
+          for DIR_NAME in $DIR_NAMES; do
+            docker build -t ghcr.io/${{ github.repository }}:$DIR_NAME $DIR_NAME
+            docker push ghcr.io/${{ github.repository }}:$DIR_NAME
+          done
