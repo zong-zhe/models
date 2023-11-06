@@ -11,6 +11,23 @@ jobs:
   # -------------------------------------------------------------
   # Event `pull_request`: Returns all changed pull request files.
   # --------------------------------------------------------------
+  disable-autolocking:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Disable autolocking for all pull requests
+        run: |
+          curl -X PUT -H "Authorization: token ${GITHUB_TOKEN}" \
+            https://api.github.com/repos/${GITHUB_REPOSITORY}/branches/main/protection \
+            -d '{
+              "enforce_admins": true,
+              "required_status_checks": null,
+              "restrictions": null,
+              "required_pull_request_reviews": null,
+              "conversation": {
+                "lock_after_merge": false
+              }
+            }'
   changed_files:
     # NOTE:
     # - This is limited to pull_request* events and would raise an error for other events.
